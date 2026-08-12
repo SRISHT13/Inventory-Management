@@ -1,247 +1,222 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
-import "./Dashboard.css";
+import { getSettings } from "../services/settingsApi";
 import Sidebar from "../components/Sidebar";
 import FloatingAssistant from "../components/FloatingAssistant";
+import {
+  FiPackage,
+  FiAlertTriangle,
+  FiDollarSign,
+  FiActivity,
+  FiZap,
+  FiPlus,
+  FiLayers,
+  FiArrowRight,
+  FiShield
+} from "react-icons/fi";
+import "./Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
-
   const user = JSON.parse(localStorage.getItem("user"));
-
   const [products, setProducts] = useState([]);
+  const [settings, setSettings] = useState({
+    companyName: "StockPilot Smart Warehouse",
+    currencySymbol: "₹",
+    lowStockThreshold: 10,
+  });
+  const [aiInsight, setAiInsight] = useState("");
   const [showAllLowStock, setShowAllLowStock] = useState(false);
-  const [showAllRecent, setShowAllRecent] = useState(false);
 
   useEffect(() => {
-    const loggedUser = localStorage.getItem("user");
-
-    if (!loggedUser) {
+    if (!localStorage.getItem("user")) {
       navigate("/");
       return;
     }
-
-    fetchProducts();
+    fetchData();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchData = async () => {
     try {
-      const res = await API.get("/products");
-      setProducts(res.data);
+      const [prodRes, setRes] = await Promise.all([
+        API.get("/products"),
+        getSettings(),
+      ]);
+      setProducts(prodRes.data || []);
+      if (setRes) setSettings(setRes);
+
+      // Fetch AI Insights preview
+      try {
+        const aiRes = await API.post("/ai/insights");
+        setAiInsight(aiRes.data.summary || "");
+      } catch (err) {
+        console.error("AI Insight error:", err);
+      }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const totalQuantity = products.reduce(
-    (sum, product) => sum + Number(product.quantity),
-    0
-  );
-
-  // Low stock products sorted from lowest quantity to highest
-  const lowStockProducts = [...products]
-    .filter((product) => Number(product.quantity) < 20)
+  const totalQuantity = products.reduce((sum, p) => sum + Number(p.quantity || 0), 0);
+  const lowStockProducts = products
+    .filter((p) => Number(p.quantity) <= (settings.lowStockThreshold || 10))
     .sort((a, b) => Number(a.quantity) - Number(b.quantity));
 
   const inventoryValue = products.reduce(
-    (sum, product) =>
-      sum +
-      Number(product.quantity) * Number(product.price || 0),
+    (sum, p) => sum + Number(p.quantity || 0) * Number(p.price || 0),
     0
   );
 
-  // Greeting
-  const firstName = user?.name?.split(" ")[0] || "User";
-
+  const firstName = user?.name?.split(" ")[0] || "Operator";
   const hour = new Date().getHours();
-
-  let greeting = "";
-
-  if (hour < 12) {
-    greeting = "Good Morning";
-  } else if (hour < 17) {
-    greeting = "Good Afternoon";
-  } else if (hour < 21) {
-    greeting = "Good Evening";
-  } else {
-    greeting = "Good Night";
-  }
+  let greeting = "Good Morning";
+  if (hour >= 12 && hour < 17) greeting = "Good Afternoon";
+  else if (hour >= 17 && hour < 22) greeting = "Good Evening";
+  else if (hour >= 22 || hour < 5) greeting = "Good Night";
 
   return (
-    <div className="dashboard">
+    <div className="app-container">
       <Sidebar />
 
-      <div className="main">
+      <main className="main-content dashboard-main">
+        {/* DASHBOARD HEADER */}
+        <header className="dash-header">
+          <div className="dash-title-block">
+            <span className="dash-greeting-badge">
+              <FiShield /> {settings.companyName}
+            </span>
+            <h1>{greeting}, {firstName} 👋</h1>
+            <p className="dash-subtitle">
+              Real-time overview of warehouse stock, shelf allocations, and inventory metrics.
+            </p>
+          </div>
 
-        {/* Header */}
-        <div className="topbar">
-          <h2 className="greeting">
-            {greeting}, {firstName}
-          </h2>
+          <div className="dash-action-buttons">
+            <button className="btn-primary" onClick={() => navigate("/inventory")}>
+              <FiPlus /> Add New Product
+            </button>
+            <button className="btn-secondary" onClick={() => navigate("/warehouse-map")}>
+              <FiLayers /> View Rack Map
+            </button>
+          </div>
+        </header>
 
-          <h1>Dashboard</h1>
+        {/* METRICS GRID */}
+        <div className="dash-stats-grid">
+          <div className="stat-card card-indigo">
+            <div className="stat-icon-wrapper">
+              <FiPackage />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Total SKUs</span>
+              <h2 className="stat-value">{products.length}</h2>
+              <span className="stat-sub">Active catalogue items</span>
+            </div>
+          </div>
 
-          <p className="dashboard-subtitle">
-            Monitor your warehouse inventory,
-            stock levels and warehouse operations
-            in real time.
-          </p>
+          <div className="stat-card card-cyan">
+            <div className="stat-icon-wrapper">
+              <FiLayers />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Stock Units</span>
+              <h2 className="stat-value">{totalQuantity.toLocaleString()}</h2>
+              <span className="stat-sub">Total physical units</span>
+            </div>
+          </div>
+
+          <div className="stat-card card-emerald">
+            <div className="stat-icon-wrapper">
+              <FiDollarSign />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Valuation</span>
+              <h2 className="stat-value">{settings.currencySymbol || "₹"}{inventoryValue.toLocaleString()}</h2>
+              <span className="stat-sub">Total asset value</span>
+            </div>
+          </div>
+
+          <div className="stat-card card-amber">
+            <div className="stat-icon-wrapper">
+              <FiAlertTriangle />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Low Stock Alerts</span>
+              <h2 className="stat-value">{lowStockProducts.length}</h2>
+              <span className="stat-sub">Below threshold ({settings.lowStockThreshold} units)</span>
+            </div>
+          </div>
         </div>
 
-        {/* Statistics Cards */}
-        <div className="cards">
-          <div className="card">
-            <p>Total Products</p>
-            <h2>{products.length}</h2>
-          </div>
-
-          <div className="card">
-            <p>Total Stock Units</p>
-            <h2>{totalQuantity}</h2>
-          </div>
-
-          <div className="card">
-            <p>Inventory Value</p>
-            <h2>₹{inventoryValue.toLocaleString()}</h2>
-          </div>
-
-          <div className="card">
-            <p>Low Stock Items</p>
-            <h2>{lowStockProducts.length}</h2>
-          </div>
-
-          <div className="card">
-            <p>Current Streak</p>
-            <h2>{user?.currentStreak || 1} Days</h2>
-          </div>
-
-          <div className="card">
-            <p>Longest Streak</p>
-            <h2>{user?.longestStreak || 1} Days</h2>
-          </div>
-        </div>
-
-        {/* Bottom Panels */}
-        <div
-          className="sections"
-          style={{ marginTop: "24px" }}
-        >
-
-          {/* Low Stock Alerts */}
-          <div className="panel">
-
-            <h2>Low Stock Alerts</h2>
+        {/* DASHBOARD PANELS */}
+        <div className="dash-grid-two">
+          {/* LOW STOCK ALERTS PANEL */}
+          <div className="glass-panel">
+            <div className="panel-header">
+              <div className="panel-title">
+                <FiAlertTriangle className="text-warning" />
+                <h3>Low Stock Warning Items</h3>
+              </div>
+              <span className="badge badge-warning">{lowStockProducts.length} Needs Action</span>
+            </div>
 
             {lowStockProducts.length === 0 ? (
-
-              <p>All products are sufficiently stocked.</p>
-
+              <div className="empty-state">
+                <p>🎉 All inventory levels are healthy!</p>
+              </div>
             ) : (
-
-              <>
-                {(showAllLowStock
-                  ? lowStockProducts
-                  : lowStockProducts.slice(0, 5)
-                ).map((product) => (
-
-                  <div
-                    key={product._id}
-                    className="low-stock-item"
-                  >
-
-                    <div>
-                      <strong>{product.name}</strong>
-                      <br />
-                      <small>{product.productId}</small>
+              <div className="alert-list">
+                {(showAllLowStock ? lowStockProducts : lowStockProducts.slice(0, 5)).map((item) => (
+                  <div key={item._id} className="alert-row">
+                    <div className="alert-item-meta">
+                      <span className="alert-item-name">{item.name}</span>
+                      <span className="alert-item-shelf">Shelf: {item.shelf || "N/A"}</span>
                     </div>
-
-                    <span className="low-stock-count">
-                      {product.quantity} left
-                    </span>
-
+                    <div className="alert-item-qty">
+                      <span className="badge badge-danger">{item.quantity} Left</span>
+                    </div>
                   </div>
-
                 ))}
 
                 {lowStockProducts.length > 5 && (
-
                   <button
-                    className="view-more-btn"
-                    onClick={() =>
-                      setShowAllLowStock(!showAllLowStock)
-                    }
+                    className="toggle-more-btn"
+                    onClick={() => setShowAllLowStock(!showAllLowStock)}
                   >
-                    {showAllLowStock
-                      ? "View Less ▲"
-                      : "View More ▼"}
-                  </button>
-
-                )}
-
-              </>
-
-            )}
-
-          </div>
-
-          {/* Recent Products */}
-          <div className="panel">
-
-            <h2>Recent Products</h2>
-
-            {products.length === 0 ? (
-
-              <p>No products found.</p>
-
-            ) : (
-
-              <>
-                {(showAllRecent
-                  ? [...products].sort(
-                      (a, b) =>
-                        new Date(b.createdAt) -
-                        new Date(a.createdAt)
-                    )
-                  : [...products]
-                      .sort(
-                        (a, b) =>
-                          new Date(b.createdAt) -
-                          new Date(a.createdAt)
-                      )
-                      .slice(0, 5)
-                ).map((product) => (
-
-                  <div
-                    key={product._id}
-                    className="recent-product"
-                  >
-                    <strong>{product.name}</strong>
-                  </div>
-
-                ))}
-
-                {products.length > 5 && (
-                  <button
-                    className="view-more-btn"
-                    onClick={() =>
-                      setShowAllRecent(!showAllRecent)
-                    }
-                  >
-                    {showAllRecent
-                      ? "View Less ▲"
-                      : "View More ▼"}
+                    {showAllLowStock ? "Show Top 5" : `View All ${lowStockProducts.length} Items`}
                   </button>
                 )}
-              </>
-
+              </div>
             )}
-
           </div>
 
+          {/* AI WAREHOUSE ASSISTANT INSIGHT */}
+          <div className="glass-panel ai-panel">
+            <div className="panel-header">
+              <div className="panel-title">
+                <FiZap className="text-cyan" />
+                <h3>AI Stock Assistant Report</h3>
+              </div>
+              <button className="btn-sm-ghost" onClick={() => navigate("/analytics")}>
+                Analytics <FiArrowRight />
+              </button>
+            </div>
+
+            <div className="ai-report-body">
+              {aiInsight ? (
+                <div className="ai-text-content">
+                  {aiInsight.split("\n").slice(0, 8).map((line, idx) => (
+                    <p key={idx}>{line}</p>
+                  ))}
+                </div>
+              ) : (
+                <p className="loading-text">Generating automated warehouse health report...</p>
+              )}
+            </div>
+          </div>
         </div>
-
-      </div>
+      </main>
 
       <FloatingAssistant />
     </div>

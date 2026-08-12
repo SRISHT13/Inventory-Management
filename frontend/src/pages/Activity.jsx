@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { getActivities } from "../services/activityApi";
+import { FiClock, FiActivity, FiUser, FiPackage, FiLayers } from "react-icons/fi";
 import "./Activity.css";
 
 function Activity() {
@@ -10,61 +11,75 @@ function Activity() {
     loadActivities();
   }, []);
 
-const loadActivities = async () => {
-  const data = await getActivities();
+  const loadActivities = async () => {
+    const data = await getActivities();
+    setActivities(data || []);
+  };
 
-  console.log("Activities:", data);
-
-  setActivities(data);
-};
+  const getActionBadge = (action) => {
+    if (action?.includes("Added")) return <span className="badge badge-success">{action}</span>;
+    if (action?.includes("Deleted")) return <span className="badge badge-danger">{action}</span>;
+    if (action?.includes("Updated")) return <span className="badge badge-warning">{action}</span>;
+    return <span className="badge badge-warning">{action || "Activity"}</span>;
+  };
 
   return (
-    <div className="dashboard">
+    <div className="app-container">
       <Sidebar />
 
-      <div className="main">
-        <div className="analytics-page">
-
-          <div className="analytics-header">
-            <h1>Activity Timeline</h1>
-            <p>Recent warehouse activities</p>
+      <main className="main-content activity-main">
+        <header className="page-header">
+          <div>
+            <h1>System Activity Log</h1>
+            <p className="page-subtitle">Real-time audit log of inventory updates, logins, and rack changes</p>
           </div>
+        </header>
 
-          <table className="analytics-table">
+        <div className="glass-panel table-container">
+          <table className="custom-table">
             <thead>
               <tr>
-                <th>Time</th>
-                <th>User</th>
-                <th>Role</th>
-                <th>Action</th>
-                <th>Product</th>
-                <th>Details</th>
+                <th>TIMESTAMP</th>
+                <th>OPERATOR</th>
+                <th>ROLE</th>
+                <th>ACTION</th>
+                <th>PRODUCT</th>
+                <th>DETAILS</th>
               </tr>
             </thead>
-
             <tbody>
-              {activities.map((activity) => (
-                <tr key={activity._id}>
-                  <td>
-                    {new Date(activity.createdAt).toLocaleString("en-IN")}
-                  </td>
-
-                  <td>{activity.user}</td>
-
-                  <td>{activity.role}</td>
-
-                  <td>{activity.action}</td>
-
-                  <td>{activity.productName || "-"}</td>
-
-                  <td>{activity.details}</td>
+              {activities.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-4">No recent activity recorded yet.</td>
                 </tr>
-              ))}
+              ) : (
+                activities.map((act) => (
+                  <tr key={act._id}>
+                    <td className="code-font">
+                      {new Date(act.createdAt).toLocaleString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td>
+                      <span className="user-name-cell">
+                        <FiUser className="user-icon" /> {act.user || "System"}
+                      </span>
+                    </td>
+                    <td><span className="role-tag">{act.role || "Worker"}</span></td>
+                    <td>{getActionBadge(act.action)}</td>
+                    <td><strong className="product-name-cell">{act.productName || "-"}</strong></td>
+                    <td className="details-cell">{act.details || "-"}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-
         </div>
-      </div>
+      </main>
     </div>
   );
 }

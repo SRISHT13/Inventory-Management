@@ -43,8 +43,8 @@ const sendOtp = async (req, res) => {
     await sendOTP(email, otp);
 
     res.status(200).json({
-      message:
-        "OTP sent successfully",
+      message: "OTP sent successfully",
+      devOtp: process.env.BREVO_API_KEY ? undefined : otp,
     });
   } catch (error) {
   console.error(error);

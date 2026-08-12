@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   FiGrid,
@@ -6,147 +7,91 @@ import {
   FiBarChart2,
   FiSettings,
   FiClock,
+  FiLogOut,
+  FiShield
 } from "react-icons/fi";
-
-import { trackLogout } from "../analytics/events";
-import { createActivity } from "../services/activityService";
-import inventoryLogo from "../assets/inventory-logo.png";
+import { getSettings } from "../services/settingsApi";
+import "./Sidebar.css";
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [companyName, setCompanyName] = useState("StockPilot Warehouse");
+  const user = JSON.parse(localStorage.getItem("user")) || { name: "Operator", role: "admin" };
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  useEffect(() => {
+    getSettings().then((data) => {
+      if (data && data.companyName) {
+        setCompanyName(data.companyName);
+      }
+    });
+  }, []);
 
-  const logout = async () => {
-    try {
-      trackLogout(user);
-
-      await createActivity({
-        user: user?.name,
-        role: user?.role,
-        action: "User Logged Out",
-        productName: "",
-        productId: "",
-        details: "User logged out of the system",
-      });
-    } catch (err) {
-      console.error(err);
-    }
-
+  const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("name");
     localStorage.removeItem("role");
-
     navigate("/");
   };
 
+  const navItems = [
+    { path: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
+    { path: "/inventory", label: "Inventory", icon: <FiPackage /> },
+    { path: "/warehouse-map", label: "Warehouse Map", icon: <FiMap /> },
+    { path: "/analytics", label: "Analytics", icon: <FiBarChart2 /> },
+    { path: "/activity", label: "Activity Log", icon: <FiClock /> },
+    { path: "/settings", label: "Settings", icon: <FiSettings /> },
+  ];
+
   return (
-    <div className="sidebar">
+    <aside className="app-sidebar">
+      {/* BRANDING HEADER */}
+      <div className="sidebar-brand">
+        <div className="brand-icon">
+          <FiShield className="brand-logo-svg" />
+        </div>
+        <div className="brand-text">
+          <h2>StockPilot</h2>
+          <span className="brand-sub">{companyName}</span>
+        </div>
+      </div>
 
-      {/* LOGO */}
+      {/* NAVIGATION LINKS */}
+      <nav className="sidebar-nav">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <div
+              key={item.path}
+              className={`nav-item ${isActive ? "active" : ""}`}
+              onClick={() => navigate(item.path)}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
+              {isActive && <div className="active-pill" />}
+            </div>
+          );
+        })}
+      </nav>
 
-      <div className="logo">
-
-        <img
-          src={inventoryLogo}
-          alt="AI Warehouse"
-          className="logo-image"
-        />
-
-        <div>
-          <h2>Mahakaushal Traders</h2>
+      {/* USER PROFILE & LOGOUT */}
+      <div className="sidebar-footer">
+        <div className="user-profile">
+          <div className="user-avatar">
+            {user?.name?.charAt(0).toUpperCase() || "U"}
+          </div>
+          <div className="user-meta">
+            <span className="user-name">{user?.name || "Operator"}</span>
+            <span className="user-role-badge">{user?.role || "Worker"}</span>
+          </div>
         </div>
 
+        <button className="sidebar-logout-btn" onClick={logout} title="Sign Out">
+          <FiLogOut />
+          <span>Sign Out</span>
+        </button>
       </div>
-
-      {/* MENU */}
-
-      <div
-        className={`menu-item ${
-          location.pathname === "/dashboard" ? "active" : ""
-        }`}
-        onClick={() => navigate("/dashboard")}
-      >
-        <FiGrid />
-        <span>Dashboard</span>
-      </div>
-
-      <div
-        className={`menu-item ${
-          location.pathname === "/inventory" ? "active" : ""
-        }`}
-        onClick={() => navigate("/inventory")}
-      >
-        <FiPackage />
-        <span>Inventory</span>
-      </div>
-
-      <div
-        className={`menu-item ${
-          location.pathname === "/warehouse-map" ? "active" : ""
-        }`}
-        onClick={() => navigate("/warehouse-map")}
-      >
-        <FiMap />
-        <span>Warehouse Map</span>
-      </div>
-
-      <div
-        className={`menu-item ${
-          location.pathname === "/analytics" ? "active" : ""
-        }`}
-        onClick={() => navigate("/analytics")}
-      >
-        <FiBarChart2 />
-        <span>Analytics</span>
-      </div>
-
-      <div
-        className={`menu-item ${
-          location.pathname === "/activity" ? "active" : ""
-        }`}
-        onClick={() => navigate("/activity")}
-      >
-        <FiClock />
-        <span>Activity</span>
-      </div>
-
-      <div
-        className={`menu-item ${
-          location.pathname === "/settings" ? "active" : ""
-        }`}
-        onClick={() => navigate("/settings")}
-      >
-        <FiSettings />
-        <span>Settings</span>
-      </div>
-
-      {/* PROFILE */}
-
-      <div className="profile">
-
-        <div className="avatar">
-          {user?.name?.charAt(0).toUpperCase()}
-        </div>
-
-        <div className="profile-info">
-          <h4>{user?.name}</h4>
-          <p>{user?.role}</p>
-        </div>
-
-      </div>
-
-      {/* LOGOUT */}
-
-      <button
-        className="logout-btn"
-        onClick={logout}
-      >
-        Sign Out
-      </button>
-
-    </div>
+    </aside>
   );
 }
 

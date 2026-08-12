@@ -7,6 +7,18 @@ const chatWithWarehouse = async (req, res) => {
 
     const products = await Product.find();
 
+    if (!process.env.GROQ_API_KEY) {
+      const match = products.find(p => p.name.toLowerCase().includes(message.toLowerCase()));
+      if (match) {
+        return res.json({
+          reply: `Found product **${match.name}**: Quantity = ${match.quantity}, Price = ₹${match.price}, Shelf = ${match.shelf || 'Unassigned'}.`
+        });
+      }
+      return res.json({
+        reply: `Currently monitoring ${products.length} product(s) in warehouse. (Add GROQ_API_KEY in backend/.env for full conversational AI abilities).`
+      });
+    }
+
     const inventory = products
       .map(
         (p) => `

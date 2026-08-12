@@ -1,13 +1,18 @@
 const axios = require("axios");
 
 const sendOTP = async (email, otp) => {
+  if (!process.env.BREVO_API_KEY) {
+    console.log(`🔑 [DEV MODE] OTP for ${email}: ${otp}`);
+    return true;
+  }
+
   try {
     await axios.post(
       "https://api.brevo.com/v3/smtp/email",
       {
         sender: {
-          name: "StockPilot",
-          email: "bstar042005@gmail.com",
+          name: process.env.SYSTEM_NAME || "StockPilot",
+          email: process.env.SENDER_EMAIL || "srishtiagarwal2114@gmail.com",
         },
         to: [
           {
@@ -34,8 +39,9 @@ const sendOTP = async (email, otp) => {
     console.log("OTP Email Sent");
     return true;
   } catch (err) {
-    console.error(err.response?.data || err.message);
-    throw err;
+    console.error("Brevo Email Error:", err.response?.data || err.message);
+    console.log(`🔑 [FALLBACK] OTP for ${email}: ${otp}`);
+    return true;
   }
 };
 

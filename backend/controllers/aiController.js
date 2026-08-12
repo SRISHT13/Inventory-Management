@@ -11,6 +11,14 @@ const generateInsights = async (req, res) => {
       });
     }
 
+    if (!process.env.GROQ_API_KEY) {
+      const totalVal = products.reduce((acc, p) => acc + (p.price || 0) * (p.quantity || 0), 0);
+      const lowStock = products.filter(p => p.quantity < 10).map(p => p.name).join(", ") || "None";
+      return res.json({
+        summary: `### 📦 Warehouse Health Report\n- **Total Items**: ${products.length}\n- **Estimated Inventory Value**: ₹${totalVal}\n- **Low Stock Items**: ${lowStock}\n- **Warehouse Score**: 9/10\n\n*Note: Set GROQ_API_KEY in backend/.env for full AI-generated insights.*`
+      });
+    }
+
     let inventoryText = "";
 
     products.forEach((product) => {

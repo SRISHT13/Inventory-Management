@@ -1,27 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { getSettings } from "../services/settingsApi";
+import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiShield, FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import "./Register.css";
-import { Eye, EyeOff } from "lucide-react";
-import inventoryLogo from "../assets/inventory-logo.png";
 
 function Register() {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("srishtiagarwal2114@gmail.com");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("worker");
+  const [role, setRole] = useState("admin");
 
   const [otp, setOtp] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [companyName, setCompanyName] = useState("StockPilot Smart Warehouse");
+
+  useEffect(() => {
+    getSettings().then((data) => {
+      if (data && data.companyName) setCompanyName(data.companyName);
+    });
+  }, []);
 
   // SEND OTP
   const handleSendOtp = async (e) => {
     e.preventDefault();
-
     try {
+      setLoading(true);
       const res = await API.post("/auth/send-otp", {
         name,
         email,
@@ -29,197 +37,175 @@ function Register() {
         role,
       });
 
-      console.log(res.data);
-      alert("OTP sent to your email!");
+      if (res.data.devOtp) {
+        alert(`🔑 Dev Mode: Your OTP for ${email} is: ${res.data.devOtp}`);
+      } else {
+        alert("OTP sent to your email inbox!");
+      }
       setShowOtp(true);
     } catch (error) {
-      console.error(error);
-
-      alert(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to send OTP"
-      );
+      alert(error.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
   // VERIFY OTP
   const handleVerifyOtp = async () => {
     try {
-      const res = await API.post("/auth/verify-otp", {
-        email,
-        otp,
-      });
-
-      console.log(res.data);
-      alert("Account Created Successfully!");
+      setLoading(true);
+      await API.post("/auth/verify-otp", { email, otp });
+      alert("Account Created Successfully! You can now log in.");
       navigate("/");
     } catch (error) {
-      console.error(error);
-
-      alert(
-        error.response?.data?.message ||
-          error.message ||
-          "OTP Verification Failed"
-      );
+      alert(error.response?.data?.message || "OTP Verification Failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-
-      {/* LEFT PANEL */}
-
-      <div className="left-panel">
-
-        <div className="logo">
-          <img
-            src={inventoryLogo}
-            alt="AI Warehouse"
-            className="logo-image"
-          />
-
-          <h2>AI Warehouse</h2>
-        </div>
-
-        <div className="hero-content">
-
-          <h3>Smart Inventory Management</h3>
-
-          <p>
-            Manage inventory, locate products,
-            monitor warehouse stock and simplify
-            daily warehouse operations using AI.
-          </p>
-
-          <ul className="feature-list">
-            <li>Real-time Inventory Tracking</li>
-            <li>AI Warehouse Assistant</li>
-            <li>Smart Product Locator</li>
-            <li>QR Support</li>
-          </ul>
-
-        </div>
-
-        {/* <div className="version">
-          AI Warehouse Management System
-        </div> */}
-
-      </div>
-
-      {/* RIGHT PANEL */}
-
-      <div className="right-panel">
-
-        <div className="login-box">
-
-          <h1>Create Account</h1>
-
-          <form onSubmit={handleSendOtp}>
-
-            <label>Full Name</label>
-
-            <input
-              type="text"
-              placeholder="Enter your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              disabled={showOtp}
-            />
-
-            <label>Email</label>
-
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={showOtp}
-            />
-
-            <label>Password</label>
-
-            <div className="password-box">
-
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={showOtp}
-              />
-
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff size={20} strokeWidth={2} />
-                ) : (
-                  <Eye size={20} strokeWidth={2} />
-                )}
-              </button>
-
+    <div className="register-wrapper">
+      <div className="register-glass-card">
+        {/* LEFT DECORATIVE HERO */}
+        <div className="register-hero">
+          <div className="hero-brand">
+            <div className="hero-logo-box">
+              <FiShield className="hero-icon" />
             </div>
+            <div>
+              <h2 className="hero-title">StockPilot</h2>
+              <p className="hero-subtitle">{companyName}</p>
+            </div>
+          </div>
 
-            <label>Role</label>
+          <div className="hero-body">
+            <h3>Start Managing Warehouse Stock Intelligently</h3>
+            <p>
+              Join your logistics team to monitor product levels, search rack locations, scan QR codes, and automate workflow insights.
+            </p>
 
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-              disabled={showOtp}
-            >
-              <option value="worker">Worker</option>
-              <option value="admin">Admin</option>
-            </select>
+            <ul className="feature-bullets">
+              <li><FiCheckCircle className="check-icon" /> Real-time SKU & Stock Tracking</li>
+              <li><FiCheckCircle className="check-icon" /> Interactive Rack Mapping</li>
+              <li><FiCheckCircle className="check-icon" /> QR Code Generation</li>
+              <li><FiCheckCircle className="check-icon" /> Automated Low Stock Alerts</li>
+            </ul>
+          </div>
+        </div>
 
-            {!showOtp ? (
-              <button
-                type="submit"
-                className="signin-btn"
-              >
-                Send OTP
-              </button>
-            ) : (
-              <>
-                <label>Enter OTP</label>
+        {/* RIGHT FORM */}
+        <div className="register-form-area">
+          <div className="form-header">
+            <h1>Create Account</h1>
+            <p>Set up your login credentials for warehouse access</p>
+          </div>
 
+          <form onSubmit={handleSendOtp} className="auth-form">
+            <div className="input-group">
+              <label>Full Name</label>
+              <div className="input-field-wrapper">
+                <FiUser className="input-icon" />
                 <input
                   type="text"
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Srishti Agarwal"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
+                  disabled={showOtp}
                 />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label>Email Address</label>
+              <div className="input-field-wrapper">
+                <FiMail className="input-icon" />
+                <input
+                  type="email"
+                  placeholder="srishtiagarwal2114@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={showOtp}
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label>Password</label>
+              <div className="input-field-wrapper">
+                <FiLock className="input-icon" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={showOtp}
+                />
+                <button
+                  type="button"
+                  className="toggle-eye"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label>Role</label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                disabled={showOtp}
+                className="select-field"
+              >
+                <option value="admin">Admin / Manager</option>
+                <option value="worker">Warehouse Worker</option>
+              </select>
+            </div>
+
+            {!showOtp ? (
+              <button type="submit" className="auth-btn-primary" disabled={loading}>
+                {loading ? "Generating OTP..." : "Send OTP"}
+                <FiArrowRight />
+              </button>
+            ) : (
+              <div className="otp-step">
+                <div className="input-group">
+                  <label>Enter 6-Digit OTP</label>
+                  <input
+                    type="text"
+                    placeholder="123456"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                    className="otp-input"
+                  />
+                </div>
 
                 <button
                   type="button"
-                  className="signin-btn"
+                  className="auth-btn-primary mt-2"
                   onClick={handleVerifyOtp}
+                  disabled={loading}
                 >
-                  Verify OTP
+                  {loading ? "Verifying..." : "Verify OTP & Create Account"}
                 </button>
-              </>
+              </div>
             )}
-
           </form>
 
-          <div className="register-link">
-            Already have an account?
+          <div className="auth-footer-link">
+            Already registered?{" "}
             <span onClick={() => navigate("/")}>
-              Login
+              Sign In
             </span>
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }
