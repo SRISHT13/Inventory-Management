@@ -16,7 +16,7 @@ const settingsSchema = new mongoose.Schema(
     },
     contactPhone: {
       type: String,
-      default: "+91 98765 43210",
+      default: "+91 9987654241",
     },
     currencySymbol: {
       type: String,

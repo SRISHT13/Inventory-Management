@@ -4,15 +4,15 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15), transparent 70%),
-              radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.1), transparent 50%);
+  background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15), transparent 70%),
+              radial-gradient(circle at 90% 80%, rgba(52, 211, 153, 0.1), transparent 50%);
 }
 
 .register-glass-card {
   width: 100%;
   max-width: 980px;
   min-height: 600px;
-  background: rgba(17, 24, 39, 0.75);
+  background: var(--bg-card);
   backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
@@ -32,7 +32,7 @@
 }
 
 .register-hero {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(6, 182, 212, 0.15));
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(52, 211, 153, 0.15));
   padding: 3rem 2.5rem;
   display: flex;
   flex-direction: column;
@@ -53,11 +53,11 @@
   align-items: center;
   gap: 0.6rem;
   font-size: 0.9rem;
-  color: #e5e7eb;
+  color: var(--text-main);
 }
 
 .check-icon {
-  color: #10b981;
+  color: var(--primary);
   font-size: 1.1rem;
 }
 
@@ -74,13 +74,13 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  color: #fff;
+  color: var(--text-main);
   font-size: 0.95rem;
 }
 
 .select-field option {
   background: #111827;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .otp-input {
@@ -91,7 +91,13 @@
   font-size: 1.2rem;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #6366f1;
+  border: 1px solid var(--primary);
   border-radius: 12px;
-  color: #fff;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+.otp-input:focus {
+  outline: none;
+  box-shadow: 0 0 15px var(--primary-glow);
 }

@@ -9,7 +9,7 @@
   align-items: center;
   gap: 0.4rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .user-icon {
@@ -26,10 +26,10 @@
 }
 
 .product-name-cell {
-  color: #e5e7eb;
+  color: var(--text-main);
 }
 
 .details-cell {
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }

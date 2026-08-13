@@ -9,7 +9,7 @@ const getSettings = async (req, res) => {
         companyName: "StockPilot Smart Warehouse",
         warehouseAddress: "Central Logistics Hub, Zone A, Suite 101",
         contactEmail: "srishtiagarwal2114@gmail.com",
-        contactPhone: "+91 98765 43210",
+        contactPhone: "+91 93843949399",
         currencySymbol: "₹",
         lowStockThreshold: 10,
       });

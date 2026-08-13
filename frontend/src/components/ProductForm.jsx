@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./ProductForm.css";
 
 function ProductForm({ onAddProduct, products = [] }) {
   const [formData, setFormData] = useState({
@@ -53,69 +54,86 @@ function ProductForm({ onAddProduct, products = [] }) {
   );
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="product-form-container">
       <h2>Add Product</h2>
+      <form onSubmit={handleSubmit} className="product-form-grid">
+        <div className="form-group">
+          <label>Product ID</label>
+          <input
+            type="text"
+            name="productId"
+            placeholder="e.g. SKU-1234"
+            className="form-input"
+            value={formData.productId}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        type="text"
-        name="productId"
-        placeholder="Product ID"
-        value={formData.productId}
-        onChange={handleChange}
-        required
-      />
+        <div className="form-group">
+          <label>Product Name</label>
+          <input
+            type="text"
+            name="name"
+            placeholder="e.g. Wireless Mouse"
+            className="form-input"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        type="text"
-        name="name"
-        placeholder="Product Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-      />
+        <div className="form-group">
+          <label>Quantity</label>
+          <input
+            type="number"
+            name="quantity"
+            placeholder="0"
+            className="form-input"
+            value={formData.quantity}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        type="number"
-        name="quantity"
-        placeholder="Quantity"
-        value={formData.quantity}
-        onChange={handleChange}
-        required
-      />
+        <div className="form-group">
+          <label>Price</label>
+          <input
+            type="number"
+            name="price"
+            placeholder="0.00"
+            className="form-input"
+            value={formData.price}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        type="number"
-        name="price"
-        placeholder="Price"
-        value={formData.price}
-        onChange={handleChange}
-        required
-      />
-
-      <select
-        name="shelf"
-        value={formData.shelf}
-        onChange={handleChange}
-        required
-      >
-        <option value="">
-          Select Shelf
-        </option>
-
-        {availableShelves.map((shelf) => (
-          <option
-            key={shelf}
-            value={shelf}
+        <div className="form-group">
+          <label>Shelf Location</label>
+          <select
+            name="shelf"
+            value={formData.shelf}
+            className="form-select"
+            onChange={handleChange}
+            required
           >
-            {shelf}
-          </option>
-        ))}
-      </select>
+            <option value="">Select Shelf</option>
+            {availableShelves.map((shelf) => (
+              <option key={shelf} value={shelf}>
+                {shelf}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <button type="submit">
-        Add Product
-      </button>
-    </form>
+        <div className="submit-btn-wrapper">
+          <button type="submit" className="btn-primary">
+            + Add Product
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 

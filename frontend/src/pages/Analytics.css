@@ -17,15 +17,15 @@
   padding: 1.25rem !important;
 }
 
-.border-emerald { border-left: 5px solid #10b981 !important; }
-.border-indigo { border-left: 5px solid #6366f1 !important; }
-.border-cyan { border-left: 5px solid #06b6d4 !important; }
-.border-amber { border-left: 5px solid #f59e0b !important; }
+.border-emerald { border-left: 5px solid var(--primary) !important; }
+.border-indigo { border-left: 5px solid var(--secondary) !important; }
+.border-cyan { border-left: 5px solid var(--primary-hover) !important; }
+.border-amber { border-left: 5px solid var(--warning) !important; }
 
 .metric-label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -33,31 +33,31 @@
 .metric-value {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-main);
 }
 
-.text-emerald { color: #10b981; }
+.text-emerald { color: var(--primary); }
 
 .metric-sub {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-dim);
 }
 
 .ai-analytics-box {
-  background: linear-gradient(135deg, rgba(17, 24, 39, 0.85), rgba(6, 182, 212, 0.08)) !important;
+  background: linear-gradient(135deg, var(--bg-card), rgba(16, 185, 129, 0.08)) !important;
 }
 
 .ai-report-container {
   font-size: 0.9rem;
   line-height: 1.7;
-  color: #d1d5db;
+  color: var(--text-main);
   max-height: 280px;
   overflow-y: auto;
   padding-right: 0.5rem;
 }
 
 .markdown-render h3, .markdown-render h2 {
-  color: #fff;
+  color: var(--text-main);
   margin-top: 0.75rem;
   margin-bottom: 0.5rem;
 }
@@ -72,7 +72,7 @@
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
   border: 1px dashed rgba(255, 255, 255, 0.1);
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .charts-grid-two {
@@ -90,6 +90,6 @@
 .chart-box h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
   margin-bottom: 1rem;
 }

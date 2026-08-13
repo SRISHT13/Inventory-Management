@@ -15,11 +15,11 @@
 .page-header h1 {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .page-subtitle {
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
@@ -45,7 +45,7 @@
 .search-icon {
   position: absolute;
   left: 1rem;
-  color: #6b7280;
+  color: var(--text-dim);
 }
 
 .search-box input {
@@ -54,13 +54,14 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  color: #fff;
+  color: var(--text-main);
   font-size: 0.9rem;
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 .filter-box {
@@ -72,7 +73,7 @@
 .filter-icon {
   position: absolute;
   left: 0.85rem;
-  color: #6b7280;
+  color: var(--text-dim);
   pointer-events: none;
 }
 
@@ -81,14 +82,15 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  color: #fff;
+  color: var(--text-main);
   font-size: 0.88rem;
   cursor: pointer;
 }
 
 .filter-box select:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 .table-container {
@@ -106,7 +108,7 @@
   padding: 1rem 1.25rem;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--text-muted);
   letter-spacing: 0.5px;
   text-transform: uppercase;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -115,40 +117,43 @@
 .custom-table td {
   padding: 1rem 1.25rem;
   font-size: 0.9rem;
-  color: #e5e7eb;
+  color: var(--text-main);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .custom-table tbody tr {
-  transition: background 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .custom-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+  box-shadow: inset 3px 0 0 var(--primary);
 }
 
 .code-font {
   font-family: monospace;
-  color: #818cf8;
+  color: var(--primary);
   font-weight: 600;
 }
 
 .product-title {
   font-weight: 600;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .qty-bold {
   font-size: 1rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .shelf-tag {
-  background: rgba(255, 255, 255, 0.06);
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-sm);
   font-size: 0.8rem;
-  color: #22d3ee;
+  color: var(--primary);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .row-actions {
@@ -162,7 +167,7 @@
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
-  color: #9ca3af;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,27 +176,34 @@
 }
 
 .edit-icon-btn:hover {
-  background: rgba(99, 102, 241, 0.2);
-  color: #818cf8;
-  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--primary);
+  border-color: rgba(16, 185, 129, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
 .delete-icon-btn:hover {
   background: rgba(239, 68, 68, 0.2);
   color: #f87171;
-  border-color: rgba(239, 68, 68, 0.4);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
 .qr-icon-btn:hover {
-  background: rgba(6, 182, 212, 0.2);
-  color: #22d3ee;
-  border-color: rgba(6, 182, 212, 0.4);
+  background: rgba(52, 211, 153, 0.2);
+  color: var(--secondary);
+  border-color: rgba(52, 211, 153, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.2);
 }
 
 /* MODALS & DRAWERS */
 .form-drawer {
-  padding: 1.5rem;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-active);
+  box-shadow: var(--shadow-card);
 }
 
 .drawer-header {
@@ -204,7 +216,7 @@
 .drawer-header h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -213,7 +225,7 @@
 .close-btn {
   background: transparent;
   border: none;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 1.2rem;
   cursor: pointer;
 }

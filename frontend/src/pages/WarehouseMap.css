@@ -16,7 +16,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  color: #fff;
+  color: var(--text-main);
   font-size: 0.9rem;
   min-width: 280px;
 }
@@ -44,7 +44,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #d1d5db;
+  color: var(--text-main);
 }
 
 .dot {
@@ -87,7 +87,7 @@
 .section-title-bar h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .shelf-grid {
@@ -151,7 +151,7 @@
 .shelf-empty {
   background: rgba(255, 255, 255, 0.03);
   border-color: rgba(255, 255, 255, 0.06);
-  color: #6b7280;
+  color: var(--text-dim);
 }
 
 .shelf-good {
@@ -188,5 +188,5 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   font-size: 0.95rem;
-  color: #e5e7eb;
+  color: var(--text-main);
 }

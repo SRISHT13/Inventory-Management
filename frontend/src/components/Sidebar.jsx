@@ -8,7 +8,9 @@ import {
   FiSettings,
   FiClock,
   FiLogOut,
-  FiShield
+  FiShield,
+  FiSun,
+  FiMoon
 } from "react-icons/fi";
 import { getSettings } from "../services/settingsApi";
 import "./Sidebar.css";
@@ -18,6 +20,16 @@ function Sidebar() {
   const location = useLocation();
   const [companyName, setCompanyName] = useState("StockPilot Warehouse");
   const user = JSON.parse(localStorage.getItem("user")) || { name: "Operator", role: "admin" };
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   useEffect(() => {
     getSettings().then((data) => {
@@ -54,6 +66,13 @@ function Sidebar() {
           <h2>StockPilot</h2>
           <span className="brand-sub">{companyName}</span>
         </div>
+        <button 
+          className="theme-toggle-btn" 
+          onClick={toggleTheme} 
+          title="Toggle Theme"
+        >
+          {theme === "light" ? <FiMoon /> : <FiSun />}
+        </button>
       </div>
 
       {/* NAVIGATION LINKS */}
